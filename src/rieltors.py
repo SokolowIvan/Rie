@@ -43,10 +43,12 @@ def parseXML(xml: str, full_df):
         text = "None"
       else:
         if elem.tag == 'image':
-            text.append[elem.text]
+            if 'image' in offer_dict:                                      #проверяем наличие аргуманта в словаре
+                text = offer_dict.get('image') + '; ' + elem.text          #собираем адреса ссылок
+            else:
+                text = elem.text
         else:
           text = elem.text
-
 
         offer_dict[elem.tag] = text     #создаем словарь
         print(offer_dict)
