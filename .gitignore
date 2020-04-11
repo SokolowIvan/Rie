@@ -1,1 +1,3 @@
 .idea
+/src/__init__.py
+/src/test.xml
