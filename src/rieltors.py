@@ -1,11 +1,9 @@
 
 import requests
 import pandas as pd
-
 from lxml import etree
 
-# with open('test.xml', 'w') as output_file:
-#   output_file.write(r.text)
+
 
 def start():
   url = 'http://topnlab.ru/export/main/database/?data=objects&chosen=1&format=yandex&key=WlyBG73La6uYi5Wa4XY'
@@ -22,8 +20,8 @@ def start():
 
   full_df = parseXML(getStringByUrl(url), full_df)
 
-  full_df.to_csv(path_or_buf=self.folder + 'out_' + str(now_str) + file_mane + '.csv', sep=',', header=True,
-                index=False, encoding='utf-8', mode='a+')
+  #full_df.to_csv(path_or_buf=self.folder + 'out_' + str(now_str) + file_mane + '.csv', sep=',', header=True,
+                #index=False, encoding='utf-8', mode='a+')
   return 0
 
 def parseXML(xml: str, full_df):
@@ -33,19 +31,37 @@ def parseXML(xml: str, full_df):
 
   root = etree.fromstring(xmlstr)
 
-  for appt in root.getchildren():
-    for elem in appt.getchildren():
-        if not elem.text:
-          text = "None"
+
+  offer_dict = {}
+  offers =[]
+
+  for offer in root.getchildren():
+    for elem in offer.getchildren():
+      a = (elem.tag.split('}')[1:])  # убираем лишнее
+      elem.tag = ''.join(a)  # делаем список строкой
+      if not elem.text:
+        text = "None"
+      else:
+        if elem.tag == 'image':
+            text.append[elem.text]
         else:
           text = elem.text
-          a = (elem.tag + " => " + text)
-          print (a)
-        #наполняем словарь
+
+
+        offer_dict[elem.tag] = text     #создаем словарь
+        print(offer_dict)
+
+      if offer.tag == "offer":
+        offers.append(offer_dict)
+        offer_dict = {}
+
+        return offers
+
+    #наполняем словарь
     #создаем датафрейм з словаря
-    df = pd.DataFrame(d, index=[0])
+    #df = pd.DataFrame(d, index=[0])
     #добовляем в датафрейи
-    full_df = full_df.append(df, ignore_index=True)
+    #full_df = full_df.append(df, ignore_index=True)
 
   return full_df
 
