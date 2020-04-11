@@ -1,0 +1,7 @@
+pandas
+lxml
+urllib3
+enhancedminidom
+requests
+BeautifulSoup4
+chardet
