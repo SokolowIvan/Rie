@@ -26,44 +26,68 @@ def start():
 
 def parseXML(xml: str, full_df):
 
-  xmlList = xml.split('\n')[1:]
+  xmlList = xml.split('\n')[1:]         #удаляем ненужный заголовок
+
   xmlstr = '\n'.join(xmlList)
+  xmlList2 = xmlstr.split('><')[2:]     #удаляем ненужный тег
+  xmlList2.pop()
 
-  root = etree.fromstring(xmlstr)
+  xmlstr2 = '><'.join(xmlList2)         #редактируем строку
+  xmlstr3 = xmlstr2 + '>'
+  xmlList3 = xmlstr3.split('</offer><')  #
+
+  for xmlList4 in xmlList3:
+    if xmlList4 == xmlList3[-1]:
+      xmlList4 = xmlList3[-1] + '</realty-feed>'
+    else:
+      xmlList4 = xmlList4 + '</offer></realty-feed>'
+
+    xmlstr6 = '<realty-feed xmlns="http://webmaster.yandex.ru/schemas/feed/realty/2010-06"><' + (''.join(xmlList4))
+
+    root = etree.fromstring(xmlstr6)
+
+    offer_dict = {}
+    offers =[]
+    #for offerl in
+    #print(root.get('offer'))
+
+    for offer in root.getchildren():
 
 
-  offer_dict = {}
-  offers =[]
 
-  for offer in root.getchildren():
-    for elem in offer.getchildren():
-      a = (elem.tag.split('}')[1:])  # убираем лишнее
-      elem.tag = ''.join(a)  # делаем список строкой
-      if not elem.text:
-        text = "None"
-      else:
-        if elem.tag == 'image':
-            if 'image' in offer_dict:                                      #проверяем наличие аргуманта в словаре
-                text = offer_dict.get('image') + '; ' + elem.text          #собираем адреса ссылок
-            else:
-                text = elem.text
+      for elem in offer.getchildren():
+        a = (elem.tag.split('}')[1:])                                        # убираем лишнее
+        elem.tag = ''.join(a)                                                # делаем список строкой
+        if not elem.text:
+          text = "000"
+        elif elem.tag == 'photo':
+              if 'image' in offer_dict:                                      #проверяем наличие аргуманта в словаре
+                  text = "None"                                              #собираем адреса ссылок
+              else:
+                  text = elem.text
         else:
-          text = elem.text
+          if elem.tag == 'image':
+              if 'image' in offer_dict:                                      #проверяем наличие аргуманта в словаре
+                  text = offer_dict.get('image') + '; ' + elem.text          #собираем адреса ссылок
+              else:
+                  text = elem.text
+          else:
+            text = elem.text
 
-        offer_dict[elem.tag] = text     #создаем словарь
-        print(offer_dict)
+          offer_dict[elem.tag] = text     #создаем словарь
+    print(offer_dict)
 
-      if offer.tag == "offer":
-        offers.append(offer_dict)
-        offer_dict = {}
+        #if offer.tag == "offer":
+          #offers.append(offer_dict)
+          #offer_dict = {}
 
-        return offers
+          #return offers
 
-    #наполняем словарь
-    #создаем датафрейм з словаря
-    #df = pd.DataFrame(d, index=[0])
-    #добовляем в датафрейи
-    #full_df = full_df.append(df, ignore_index=True)
+      #наполняем словарь
+      #создаем датафрейм з словаря
+      #df = pd.DataFrame(d, index=[0])
+      #добовляем в датафрейи
+      #full_df = full_df.append(df, ignore_index=True)
 
   return full_df
 
