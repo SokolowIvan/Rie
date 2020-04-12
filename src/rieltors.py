@@ -27,34 +27,28 @@ def start():
 def parseXML(xml: str, full_df):
 
   xmlList = xml.split('\n')[1:]         #удаляем ненужный заголовок
-
   xmlstr = '\n'.join(xmlList)
   xmlList2 = xmlstr.split('><')[2:]     #удаляем ненужный тег
   xmlList2.pop()
-
   xmlstr2 = '><'.join(xmlList2)         #редактируем строку
   xmlstr3 = xmlstr2 + '>'
   xmlList3 = xmlstr3.split('</offer><')  #
+  offer_dict = {}
 
   for xmlList4 in xmlList3:
+    s = xmlList4.split('><')[0]
+    s1 = s.split('"')[1]
+    offer_dict['id'] = s1
+
     if xmlList4 == xmlList3[-1]:
       xmlList4 = xmlList3[-1] + '</realty-feed>'
     else:
       xmlList4 = xmlList4 + '</offer></realty-feed>'
-
     xmlstr6 = '<realty-feed xmlns="http://webmaster.yandex.ru/schemas/feed/realty/2010-06"><' + (''.join(xmlList4))
 
     root = etree.fromstring(xmlstr6)
 
-    offer_dict = {}
-    offers =[]
-    #for offerl in
-    #print(root.get('offer'))
-
     for offer in root.getchildren():
-
-
-
       for elem in offer.getchildren():
         a = (elem.tag.split('}')[1:])                                        # убираем лишнее
         elem.tag = ''.join(a)                                                # делаем список строкой
@@ -77,11 +71,9 @@ def parseXML(xml: str, full_df):
           offer_dict[elem.tag] = text     #создаем словарь
     print(offer_dict)
 
-        #if offer.tag == "offer":
-          #offers.append(offer_dict)
-          #offer_dict = {}
 
-          #return offers
+
+    #return offers
 
       #наполняем словарь
       #создаем датафрейм з словаря
