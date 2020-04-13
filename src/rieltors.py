@@ -7,35 +7,48 @@ from lxml import etree
 
 def start():
 
-  global full_df
   url = 'http://topnlab.ru/export/main/database/?data=objects&chosen=1&format=yandex&key=WlyBG73La6uYi5Wa4XY'
 
-
-  full_df = parseXML(getStringByUrl(url), full_df)
+  full_df = parseXML(getStringByUrl(url))
   file = os.getcwd() + 'data.csv'
-  try:
-    self.data_file = pd.read_csv(file)
-  except IOError as e:
-    full_df.to_csv(file, sep=',', header=True, index=False, encoding='utf-8', mode='a+')
-    print(u'не удалось открыть файл')
-  else:
-    with file:
-      print(u'делаем что-то с файлом')
 
-  #self.data_file = pd.read_csv(path_data_file)                              #это создание из csv DataFrame
+  # if os.path.exists(file):
+  #
+  # try:
+  #   read_df = patd.read_csv(file)
+  # except IOError as e:
+  #   print(u'не удалось открыть файл')
+  # else:
+  #   with file:
+  #     print(u'делаем что-то с файлом')
+  full_df.to_csv(path_or_buf=file, sep=',', header=True, index=False, encoding='utf-8', mode='w')
 
-  #full_df = pd.DataFrame()
+  #data_file = pd.read_csv(path_data_file)                              #это создание из csv DataFrame
+  pass
 
-
-
-  #full_df.to_csv(path_or_buf=self.folder + 'out_' + str(now_str) + file_mane + '.csv', sep=',', header=True,index=False, encoding='utf-8', mode='a+')
-  #full_df.to_csv('dddd')
-
-  return 0
-
-def parseXML(xml: str, full_df):
+def parseXML(xml: str):
+  full_df = pd.DataFrame()
   xmlList = xml.split('\n')[1:]                                              #удаляем ненужный заголовок
   xmlstr = '\n'.join(xmlList)
+
+  root = etree.fromstring(xmlstr)
+
+  for element in root.getchildren():
+    test = {}
+    if element.tag != '{http://webmaster.yandex.ru/schemas/feed/realty/2010-06}generation-date':
+      #вот тут офер
+      id = element.get('internal-id')
+      for param in element.getchildren():
+        if '':
+          pass
+        elif ':':
+          pass
+        elif params.tag =
+        pass
+        # param.tag == 'image':\
+        #   {}
+      pass
+
   xmlList2 = xmlstr.split('><')[2:]                                          #удаляем ненужный тег
   xmlList2.pop()
   xmlstr2 = '><'.join(xmlList2)                                              #редактируем строку
