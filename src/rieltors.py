@@ -7,7 +7,9 @@ from lxml import etree
 
 def start():
 
+  global full_df
   url = 'http://topnlab.ru/export/main/database/?data=objects&chosen=1&format=yandex&key=WlyBG73La6uYi5Wa4XY'
+
 
   full_df = parseXML(getStringByUrl(url), full_df)
   file = os.getcwd() + 'data.csv'
