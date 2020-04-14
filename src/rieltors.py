@@ -7,9 +7,9 @@ from lxml import etree
 
 def start():
     url = 'http://topnlab.ru/export/main/database/?data=objects&chosen=1&format=yandex&key=WlyBG73La6uYi5Wa4XY'
-
     full_df = parseXML(getStringByUrl(url))
     file = os.getcwd()+'data.csv'
+    full_df.to_csv(path_or_buf=file, sep=',', header=True, index=False, encoding='utf-8', mode='w')
 
     # if os.path.exists(file):
     #
@@ -25,11 +25,7 @@ def start():
 
     pass
 
-
 def parseXML(xml: str):
-
-
-    global name_file
     full_df = pd.DataFrame()
     xmlList = xml.split('\n')[1:]
     xmlstr = '\n'.join(xmlList)
@@ -60,7 +56,6 @@ def parseXML(xml: str):
             offer_id = element.get('internal-id')
             offer_dict['offer_id'] = offer_id
             pictures.append(offer_id)
-
         for param in element.getchildren():
             if param.tag == nsmap + 'location':
                 for item in param.getchildren():
@@ -172,7 +167,6 @@ def parseXML(xml: str):
                 offer_dict['metro_id'] = param.text
             elif param.tag == nsmap + 'room-furniture':
                 offer_dict['room_furniture'] = param.text
-
         file = open("file.txt", "w")
         file.write('\n'.join(pictures))
         file.close()
@@ -180,10 +174,7 @@ def parseXML(xml: str):
         dict.clear(offer_dict)
         full_df = full_df.append(df, ignore_index=True)
     return full_df
-
 def getStringByUrl(url: str) -> str:
     return requests.get(url).text
-
-
 if __name__ == "__main__":
     start()
