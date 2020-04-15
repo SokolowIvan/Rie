@@ -1,35 +1,26 @@
 import os
 import requests
+import shutil
 import pandas as pd
 from lxml import etree
 
 
-
 def start():
-    url = 'http://topnlab.ru/export/main/database/?data=objects&chosen=1&format=yandex&key=WlyBG73La6uYi5Wa4XY'
+    with open('input.txt') as file:
+        url = str(file.readline())
+    if os.path.isdir('result'):
+        shutil.rmtree('result')
     full_df = parseXML(getStringByUrl(url))
-    file = os.getcwd()+'data.csv'
+    os.chdir('result')
+    file = os.getcwd() +'/data.csv'
     full_df.to_csv(path_or_buf=file, sep=',', header=True, index=False, encoding='utf-8', mode='w')
-
-    # if os.path.exists(file):
-    #
-    # try:
-    #   read_df = patd.read_csv(file)
-    # except IOError as e:
-    #   print(u'не удалось открыть файл')
-    # else:
-    #   with file:
-    #     print(u'делаем что-то с файлом')
-    full_df.to_csv(path_or_buf=file, sep=',', header=True, index=False, encoding='utf-8', mode='w')
-
-
     pass
 
 def parseXML(xml: str):
+    os.mkdir('result')
     full_df = pd.DataFrame()
     xmlList = xml.split('\n')[1:]
     xmlstr = '\n'.join(xmlList)
-    pictures = []
     offer_dict = dict({'offer_id': 'None', 'type_housing': 'None', 'deal_status': 'None', 'property_status': 'None',
          'is_new_house': 'None',
          'type_house': 'None', 'type_house_height': 'None', 'type_new': 'None', 'country_properties': 'None',
@@ -55,7 +46,6 @@ def parseXML(xml: str):
         if element.tag != '{http://webmaster.yandex.ru/schemas/feed/realty/2010-06}generation-date':
             offer_id = element.get('internal-id')
             offer_dict['offer_id'] = offer_id
-            pictures.append(offer_id)
         for param in element.getchildren():
             if param.tag == nsmap + 'location':
                 for item in param.getchildren():
@@ -91,10 +81,26 @@ def parseXML(xml: str):
                 for item in param.getchildren():
                     if item.tag == nsmap + 'value':
                         offer_dict['price_area_base_value'] = item.text
-
             elif param.tag == nsmap + 'image':
-                pictures.append(param.text)
-
+                img = param.text.split('/')[-1]
+                file = os.getcwd()
+                os.chdir('result')
+                text = 'image'+ offer_id
+                if not os.path.isdir(text):
+                    os.mkdir(text)
+                    os.chdir(text)
+                    p = requests.get(param.text)
+                    with open(img, 'wb') as target:
+                        target.write(p.content)
+                        target.close()
+                        os.chdir(file)
+                else:
+                    os.chdir(text)
+                    p = requests.get(param.text)
+                    with open(img, 'wb') as target:
+                        target.write(p.content)
+                        target.close()
+                        os.chdir(file)
             elif param.tag == nsmap + 'price':
                 for item in param.getchildren():
                     if item.tag == nsmap + 'value':
@@ -167,12 +173,10 @@ def parseXML(xml: str):
                 offer_dict['metro_id'] = param.text
             elif param.tag == nsmap + 'room-furniture':
                 offer_dict['room_furniture'] = param.text
-        file = open("file.txt", "w")
-        file.write('\n'.join(pictures))
-        file.close()
         df = pd.DataFrame(offer_dict, index=[0])
         dict.clear(offer_dict)
         full_df = full_df.append(df, ignore_index=True)
+        print(full_df[['description']])
     return full_df
 def getStringByUrl(url: str) -> str:
     return requests.get(url).text
