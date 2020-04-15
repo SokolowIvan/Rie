@@ -14,6 +14,7 @@ def start():
     os.chdir('result')
     file = os.getcwd() +'/data.csv'
     full_df.to_csv(path_or_buf=file, sep=',', header=True, index=False, encoding='utf-8', mode='w')
+
     pass
 
 def parseXML(xml: str):
